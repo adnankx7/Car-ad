@@ -1,0 +1,24 @@
+{
+  "name": "ad-reviewer-node",
+  "version": "0.1.0",
+  "description": "Car ad reviewer using Node.js and LangChain",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "langchain": "^0.1.25",
+    "dotenv": "^16.3.1",
+    "@langchain/groq": "^0.0.8",
+    "@langchain/core": "^0.1.52",
+    "multer": "^1.4.5-lts.1",
+    "onnxruntime-node": "^1.17.0",
+    "sharp": "^0.33.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

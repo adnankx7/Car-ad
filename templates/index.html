@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Car Entry Form</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="form-container">
+    <h1>Add Car Details</h1>
+    <form id="carForm">
+      <label>Car Brand:</label>
+      <input type="text" name="brand" required>
+
+      <label>Model:</label>
+      <input type="text" name="model" required>
+
+      <label>Variant:</label>
+      <input type="text" name="variant" required>
+
+      <label>Year:</label>
+      <input type="number" name="year" required>
+
+      <label>Mileage (km):</label>
+      <input type="number" name="mileage" required>
+
+      <label>Fuel Type:</label>
+      <select name="fuelType" required>
+        <option value="Petrol">Petrol</option>
+        <option value="Diesel">Diesel</option>
+        <option value="Hybrid">Hybrid</option>
+        <option value="Electric">Electric</option>
+      </select>
+
+      <label>Engine Type:</label>
+      <input type="text" name="engineType" required>
+
+      <label>Transmission:</label>
+      <select name="transmission" required>
+        <option value="Automatic">Automatic</option>
+        <option value="Manual">Manual</option>
+      </select>
+
+      <label>Condition:</label>
+      <select name="condition" required>
+        <option value="Used">Used</option>
+        <option value="New">New</option>
+      </select>
+
+      <label>Images:</label>
+      <input type="file" name="images" accept="image/*" multiple required>
+
+      <label>Description:</label>
+      <textarea name="description" rows="4"></textarea>
+
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
