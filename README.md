@@ -1,13 +1,57 @@
 # AI-Powered Car Ad Reviewer with Image Classification
 
-This is a Node.js Express web application for submitting car ads, which combines image classification to detect vehicle images and AI-powered text review using LangChain.js and Groq's Llama-3.1-8B-Instant model to automatically review ad descriptions for appropriateness (e.g., offensive language, misleading claims, mismatches). Ads are approved only if images are classified as vehicles and description is appropriate; otherwise, rejected. Ads are saved to `data.json` with review status ("approve" or "reject") and reason.
+This is a Node.js Express web application for submitting car ads, which combines image classification to detect vehicle images and AI-powered text review using reviewAgent.js and Groq's Llama-3.1-8B-Instant model to automatically review ad descriptions for appropriateness (e.g., offensive language, misleading claims, mismatches). Ads are approved only if images are classified as vehicles and description is appropriate; otherwise, rejected. Ads are saved to `data.json` with review status ("approve" or "reject") and reason.
 
 ## Features
 - Web form for entering car details (brand, model, variant, year, mileage, fuel type, engine type, transmission, condition, description).
+- Image classification using an ONNX model to verify uploaded images are of vehicles.
 - AI review using Groq's Llama-3.1-8B-Instant model to detect inappropriate content.
 - Saves all ads to `data.json` with review status and reason.
 - Supports multilingual ads (English, Urdu, Roman Urdu).
-- Error handling for API connection issues.
+- Error handling for API connection issues and model failures.
+
+## Image Classification
+The application uses a pre-trained ONNX (Open Neural Network Exchange) model for image classification, trained to distinguish between "vehicle" and "non-vehicle" images. This ensures that only ads with valid vehicle photos are processed further.
+
+### How It Works
+1. **Model Loading**: On startup, the app loads the ONNX model from `runs/classify/train/weights/best.onnx` using the `onnxruntime-node` library.
+2. **Image Preprocessing**: Uploaded images are resized to 224x224 pixels using Sharp, converted to RGB, and normalized (pixel values divided by 255.0). The channels are transposed from HWC (Height, Width, Channels) to CHW (Channels, Height, Width) format as required by the model.
+3. **Inference**: The preprocessed image tensor is fed into the ONNX session for prediction. The model outputs probabilities for "non-vehicle" and "vehicle" classes.
+4. **Decision**: If any image is classified as "non-vehicle", the ad is rejected immediately. Only ads with all images as "vehicle" proceed to AI review.
+5. **Performance**: Classification is fast and runs locally, avoiding external API calls for images.
+
+### System Requirements and Resources
+To run the ONNX model for image classification, the following resources are recommended:
+
+- **CPU**: Multi-core processor (at least 4 cores) for efficient inference. Modern CPUs (e.g., Intel i5 or equivalent) can process images in 100-500ms per image. GPU acceleration is not supported in this Node.js setup, so CPU-only.
+- **RAM**: 8GB recommended. The model loads into memory (~100-200MB for the ONNX runtime session), plus additional space for image processing.
+- **Disk Space**: ~200MB for the model file (`best.onnx`), plus space for uploaded images and results.
+- **Processing Power**: Low to moderate. The model is lightweight (YOLOv8 classification variant), optimized for real-time inference. Batch processing multiple images sequentially is supported but not parallelized in this implementation.
+- **Dependencies**: Requires `onnxruntime-node` (installed via npm), which is optimized for performance on x86/ARM architectures.
+
+Note: The model was trained using YOLOv8 (results in `runs/classify/train/` include confusion matrices, training batches, and metrics). For production scaling, consider offloading to a GPU-enabled service if high throughput is needed.
+
+## AI Review Agent
+The AI review agent leverages LangChain.js to chain a prompt template with Groq's Llama-3.1-8B-Instant large language model (LLM) for content moderation. It enforces strict rules to ensure ad descriptions are appropriate, truthful, and relevant.
+
+### How the Agent Works
+1. **Setup**: The agent is initialized in `reviewAgent.js` using LangChain's `ChatGroq` class, configured with the Groq API key from `.env`. It uses a `PromptTemplate` to structure inputs and a `JsonOutputParser` to ensure structured JSON responses.
+2. **Prompt Engineering**: The prompt is a detailed template that includes:
+   - Ad details (brand, model, etc.) as variables.
+   - Multilingual support for English, Urdu script, and Roman Urdu.
+   - Specific rules for rejection (e.g., inappropriate language, mismatches, spammy content).
+   - Allowances for common car-related terms (e.g., "minor touch", "duplicate file").
+   - Instructions to respond only in JSON format with "decision" ("Approve" or "Reject") and "reason".
+3. **Processing**: When an ad passes image classification, the agent receives the ad data, formats it into the prompt, and invokes the LLM via Groq's API.
+4. **Decision Making**: The LLM analyzes the description against the rules:
+   - Rejects for offensive/abusive language in any language.
+   - Allows subjective claims (e.g., "like new") but rejects verifiable mismatches (e.g., brand mismatch).
+   - Flags irrelevant or suspicious content.
+   - Special handling for "duplicate" mentions (allowed unless combined with "original").
+5. **Output**: Returns a JSON object with approval/rejection and a clear reason. If the LLM fails (e.g., API error), the app handles it gracefully with user-friendly messages.
+6. **Integration**: The agent's `getAdReviewChain()` function returns a runnable chain (prompt → LLM → parser) that integrates seamlessly into the Express route handler.
+
+This agent ensures consistent, rule-based moderation without manual intervention, supporting high-volume ad submissions.
 
 ## Prerequisites
 - Node.js 16+.
