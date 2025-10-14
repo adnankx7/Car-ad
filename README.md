@@ -2,10 +2,6 @@
 
 This is a Node.js Express web application for submitting car ads, which combines image classification to detect vehicle images and AI-powered text review using LangChain and Groq's Llama-3.1-8B-Instant model to automatically review ad descriptions for appropriateness (e.g., offensive language, misleading claims, mismatches). Ads are approved only if images are classified as vehicles and description is appropriate; otherwise, rejected. Ads are saved to `data.json` with review status ("approve" or "reject") and reason.
 
-### How This Code Works and Connects with Web
-- **Backend (Node.js/Express)**: The app runs as a server on port 3000. It serves static files (HTML, CSS, JS) and handles form submissions via POST to `/submit`. Image classification happens locally using ONNX, and AI review calls Groq's API. Results are saved to JSON and responses sent back as JSON.
-- **Frontend Integration**: The web form (`templates/index.html`) submits data via JavaScript (`static/script.js`) using Fetch API to the backend. No full-stack framework; simple AJAX for communication. Can be integrated into any web app by calling the `/submit` endpoint with form data.
-- **Deployment**: Run locally or deploy to Heroku/Vercel. For web integration, embed the form in your site and proxy API calls to this server.
 
 ## Features
 - Web form for entering car details (brand, model, variant, year, mileage, fuel type, engine type, transmission, condition, description).
@@ -43,6 +39,11 @@ To customize or retrain the classification model:
 3. **Training**: Run YOLOv8 classification training with commands like `yolo classify train data=path/to/data.yaml model=yolov8n-cls.pt epochs=100`. Export to ONNX: `yolo export model=path/to/best.pt format=onnx`.
 4. **Local API**: For a standalone API, use FastAPI or Flask in Python to serve the ONNX model. Example: Load model with `onnxruntime` and expose endpoints for image classification. This allows the Node.js app to call a local API instead of embedding the model.
 5. **Benefits**: Fully open-source, customizable, no external dependencies. Host locally for privacy/security.
+
+### How This Code Works and Connects with Web
+- **Backend (Node.js/Express)**: The app runs as a server on port 3000. It serves static files (HTML, CSS, JS) and handles form submissions via POST to `/submit`. Image classification happens locally using ONNX, and AI review calls Groq's API. Results are saved to JSON and responses sent back as JSON.
+- **Frontend Integration**: The web form (`templates/index.html`) submits data via JavaScript (`static/script.js`) using Fetch API to the backend. No full-stack framework; simple AJAX for communication. Can be integrated into any web app by calling the `/submit` endpoint with form data.
+- **Deployment**: Run locally or deploy to Heroku/Vercel. For web integration, embed the form in your site and proxy API calls to this server.
 
 ## AI Review Agent
 The AI review agent leverages LangChain.js to chain a prompt template with Groq's Llama-3.1-8B-Instant large language model (LLM) for content moderation. It enforces strict rules to ensure ad descriptions are appropriate, truthful, and relevant.
