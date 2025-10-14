@@ -1,6 +1,6 @@
 # AI-Powered Car Ad Reviewer with Image Classification
 
-This is a Node.js Express web application for submitting car ads, which combines image classification to detect vehicle images and AI-powered text review using reviewAgent.js and Groq's Llama-3.1-8B-Instant model to automatically review ad descriptions for appropriateness (e.g., offensive language, misleading claims, mismatches). Ads are approved only if images are classified as vehicles and description is appropriate; otherwise, rejected. Ads are saved to `data.json` with review status ("approve" or "reject") and reason.
+This is a Node.js Express web application for submitting car ads, which combines image classification to detect vehicle images and AI-powered text review using langchain and Groq's Llama-3.1-8B-Instant model to automatically review ad descriptions for appropriateness (e.g., offensive language, misleading claims, mismatches). Ads are approved only if images are classified as vehicles and description is appropriate; otherwise, rejected. Ads are saved to `data.json` with review status ("approve" or "reject") and reason.
 
 ## Features
 - Web form for entering car details (brand, model, variant, year, mileage, fuel type, engine type, transmission, condition, description).
