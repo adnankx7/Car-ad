@@ -82,6 +82,3 @@ data.json
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# ML runs
-runs/
