@@ -35,10 +35,9 @@ Note: The model was trained using YOLOv8 (results in `runs/classify/train/` incl
 ### Build Our Own Model
 To customize or retrain the classification model:
 1. **Tools**: Use open-source libraries like Ultralytics YOLOv8 (Python-based) for training. Install via `pip install ultralytics`.
-2. **Dataset**: Prepare a dataset of vehicle and non-vehicle images (e.g., from Kaggle or custom collection). Label them accordingly.
+2. **Dataset**: Prepare a dataset of vehicle and non-vehicle images. Label them accordingly.
 3. **Training**: Run YOLOv8 classification training with commands like `yolo classify train data=path/to/data.yaml model=yolov8n-cls.pt epochs=100`. Export to ONNX: `yolo export model=path/to/best.pt format=onnx`.
-4. **Local API**: For a standalone API, use FastAPI or Flask in Python to serve the ONNX model. Example: Load model with `onnxruntime` and expose endpoints for image classification. This allows the Node.js app to call a local API instead of embedding the model.
-5. **Benefits**: Fully open-source, customizable, no external dependencies. Host locally for privacy/security.
+4. **Benefits**: Fully open-source, customizable, no external dependencies. Host locally for privacy/security.
 
 ### How This Code Works and Connects with Web
 - **Backend (Node.js/Express)**: The app runs as a server on port 3000. It serves static files (HTML, CSS, JS) and handles form submissions via POST to `/submit`. Image classification happens locally using ONNX, and AI review calls Groq's API. Results are saved to JSON and responses sent back as JSON.
