@@ -14,13 +14,6 @@ This is a Node.js Express web application for submitting car ads, which combines
 ## Image Classification
 The application uses a pre-trained ONNX (Open Neural Network Exchange) model for image classification, trained to distinguish between "vehicle" and "non-vehicle" images. This ensures that only ads with valid vehicle photos are processed further.
 
-### How It Works
-1. **Model Loading**: On startup, the app loads the ONNX model from `runs/classify/train/weights/best.onnx` using the `onnxruntime-node` library.
-2. **Image Preprocessing**: Uploaded images are resized to 224x224 pixels using Sharp, converted to RGB, and normalized (pixel values divided by 255.0). The channels are transposed from HWC (Height, Width, Channels) to CHW (Channels, Height, Width) format as required by the model.
-3. **Inference**: The preprocessed image tensor is fed into the ONNX session for prediction. The model outputs probabilities for "non-vehicle" and "vehicle" classes.
-4. **Decision**: If any image is classified as "non-vehicle", the ad is rejected immediately. Only ads with all images as "vehicle" proceed to AI review.
-5. **Performance**: Classification is fast and runs locally, avoiding external API calls for images.
-
 ### System Requirements and Resources
 To run the ONNX model for image classification, the following resources are recommended:
 
@@ -32,7 +25,14 @@ To run the ONNX model for image classification, the following resources are reco
 
 Note: The model was trained using YOLOv8 (results in `runs/classify/train/` include confusion matrices, training batches, and metrics). For production scaling, consider offloading to a GPU-enabled service if high throughput is needed.
 
-### Building Your Own Local Open-Source Model
+### How It Works
+1. **Model Loading**: On startup, the app loads the ONNX model from `runs/classify/train/weights/best.onnx` using the `onnxruntime-node` library.
+2. **Image Preprocessing**: Uploaded images are resized to 224x224 pixels using Sharp, converted to RGB, and normalized (pixel values divided by 255.0). The channels are transposed from HWC (Height, Width, Channels) to CHW (Channels, Height, Width) format as required by the model.
+3. **Inference**: The preprocessed image tensor is fed into the ONNX session for prediction. The model outputs probabilities for "non-vehicle" and "vehicle" classes.
+4. **Decision**: If any image is classified as "non-vehicle", the ad is rejected immediately. Only ads with all images as "vehicle" proceed to AI review.
+5. **Performance**: Classification is fast and runs locally, avoiding external API calls for images.
+
+### Build Our Own Model
 To customize or retrain the classification model:
 1. **Tools**: Use open-source libraries like Ultralytics YOLOv8 (Python-based) for training. Install via `pip install ultralytics`.
 2. **Dataset**: Prepare a dataset of vehicle and non-vehicle images (e.g., from Kaggle or custom collection). Label them accordingly.
@@ -43,7 +43,6 @@ To customize or retrain the classification model:
 ### How This Code Works and Connects with Web
 - **Backend (Node.js/Express)**: The app runs as a server on port 3000. It serves static files (HTML, CSS, JS) and handles form submissions via POST to `/submit`. Image classification happens locally using ONNX, and AI review calls Groq's API. Results are saved to JSON and responses sent back as JSON.
 - **Frontend Integration**: The web form (`templates/index.html`) submits data via JavaScript (`static/script.js`) using Fetch API to the backend. No full-stack framework; simple AJAX for communication. Can be integrated into any web app by calling the `/submit` endpoint with form data.
-- **Deployment**: Run locally or deploy to Heroku/Vercel. For web integration, embed the form in your site and proxy API calls to this server.
 
 ## AI Review Agent
 The AI review agent leverages LangChain.js to chain a prompt template with Groq's Llama-3.1-8B-Instant large language model (LLM) for content moderation. It enforces strict rules to ensure ad descriptions are appropriate, truthful, and relevant.
